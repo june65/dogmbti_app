@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dogmbti/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(MyApp());
 }
 
@@ -140,6 +142,26 @@ class _MyHomePageState extends State<MyHomePage> {
           _prediction,
           style: Theme.of(context).textTheme.headline6,
         ),
+        GestureDetector(
+          onTap: () async {
+            await FirebaseFirestore.instance
+                .collection('result')
+                .doc('data')
+                .set({
+              'result': 1,
+            });
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.camera),
+              SizedBox(
+                width: 10,
+              ),
+              Text('카메라'),
+            ],
+          ),
+        )
       ],
     );
   }
