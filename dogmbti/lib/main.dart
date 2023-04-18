@@ -1,10 +1,10 @@
+import 'dart:io';
 import 'dart:typed_data';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dogmbti/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:image_picker/image_picker.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
 void main() async {
@@ -12,7 +12,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   runApp(MyApp());
 }
 
@@ -39,13 +38,78 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    predict();
+  }
+
+  XFile? image;
+  String imageUrl = '';
+
+  final ImagePicker picker = ImagePicker();
+  Future getImage(ImageSource media) async {
+    XFile? img = await picker.pickImage(source: media);
+
+    setState(() {
+      image = img;
+    });
+  }
+
+  void myAlert() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            title: const Text('이미지를 어디서 가져올까요?'),
+            content: SizedBox(
+              height: MediaQuery.of(context).size.height / 6,
+              child: Column(
+                children: [
+                  ElevatedButton(
+                    //if user click this button, user can upload image from gallery
+                    onPressed: () {
+                      Navigator.pop(context);
+                      getImage(ImageSource.gallery);
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.image),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text('갤러리'),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    //if user click this button. user can upload image from camera
+                    onPressed: () {
+                      Navigator.pop(context);
+                      getImage(ImageSource.camera);
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.camera),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text('카메라'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   Future<void> predict() async {
     final interpreter = await Interpreter.fromAsset('dog_not_dog_v3.tflite');
 
-    final imageBytes = await rootBundle.load('assets/image_cat.jpg');
+    //final imageBytes = await rootBundle.load('assets/image_cat.jpg');
+    final imageBytes = File(image!.path).readAsBytesSync();
     final img.Image? decodedImage =
         img.decodeImage(imageBytes.buffer.asUint8List());
 
@@ -142,14 +206,24 @@ class _MyHomePageState extends State<MyHomePage> {
           _prediction,
           style: Theme.of(context).textTheme.headline6,
         ),
+        image != null
+            ? Image.file(
+                File(image!.path),
+                fit: BoxFit.cover,
+                width: MediaQuery.of(context).size.width,
+              )
+            : Container(),
         GestureDetector(
           onTap: () async {
+            myAlert();
+            /*
             await FirebaseFirestore.instance
                 .collection('result')
                 .doc('data')
                 .set({
               'result': 1,
             });
+            */
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -158,7 +232,22 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 width: 10,
               ),
-              Text('카메라'),
+              Text('이미지'),
+            ],
+          ),
+        ),
+        GestureDetector(
+          onTap: () async {
+            predict();
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.camera),
+              SizedBox(
+                width: 10,
+              ),
+              Text('분석하기'),
             ],
           ),
         )
