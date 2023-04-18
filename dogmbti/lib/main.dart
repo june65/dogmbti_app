@@ -35,21 +35,23 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> predict() async {
-    final interpreter =
-        await Interpreter.fromAsset('mobilenet_v1_1.0_224_quant.tflite');
+    final interpreter = await Interpreter.fromAsset('dog_not_dog_v3.tflite');
 
-    final imageBytes = await rootBundle.load('assets/image.jpg');
+    final imageBytes = await rootBundle.load('assets/image_cat.jpg');
     final img.Image? decodedImage =
         img.decodeImage(imageBytes.buffer.asUint8List());
 
     if (decodedImage != null) {
       final resizedImage =
           img.copyResize(decodedImage, width: 224, height: 224);
-      var input = _imageToByteListUint8(resizedImage);
-      var output = Uint8List(1 * 1001);
-      interpreter.run(input, output);
 
-      List<dynamic> outputTensor = output.reshape([1, 1001]);
+      print(interpreter.getInputTensors()[0]);
+      print(interpreter.getOutputTensors()[0]);
+      var input = _imageToByteListFloat32(resizedImage);
+      var output = Float32List(5).reshape([1, 5]);
+      interpreter.run(input, output);
+      print(output);
+      List<dynamic> outputTensor = output;
       final predictedLabel = _getPredictedLabel(outputTensor);
 
       setState(() {
@@ -62,17 +64,46 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Uint8List _imageToByteListUint8(img.Image image) {
-    var convertedBytes = Uint8List(1 * 224 * 224 * 3);
+  /*
+  Float32List _imageToByteListFloat32(img.Image image) {
+    var convertedBytes = Float32List(1 * 224 * 224 * 3);
     int pixelIndex = 0;
     for (var i = 0; i < 224; i++) {
       for (var j = 0; j < 224; j++) {
         var pixel = image.getPixel(j, i);
-        convertedBytes[pixelIndex++] = img.getRed(pixel);
-        convertedBytes[pixelIndex++] = img.getGreen(pixel);
-        convertedBytes[pixelIndex++] = img.getBlue(pixel);
+        convertedBytes[pixelIndex++] = img.getRed(pixel) / 255.0;
+        convertedBytes[pixelIndex++] = img.getGreen(pixel) / 255.0;
+        convertedBytes[pixelIndex++] = img.getBlue(pixel) / 255.0;
       }
     }
+    return convertedBytes;
+  }
+  */
+
+  List<List<List<List<double>>>> _imageToByteListFloat32(img.Image image) {
+    var convertedBytes = List.generate(
+      1,
+      (index) => List.generate(
+        224,
+        (index) => List.generate(
+          224,
+          (index) => List.generate(
+            3,
+            (index) => 0.0,
+          ),
+        ),
+      ),
+    );
+
+    for (var i = 0; i < 224; i++) {
+      for (var j = 0; j < 224; j++) {
+        var pixel = image.getPixel(j, i);
+        convertedBytes[0][i][j][0] = img.getRed(pixel) / 255.0;
+        convertedBytes[0][i][j][1] = img.getGreen(pixel) / 255.0;
+        convertedBytes[0][i][j][2] = img.getBlue(pixel) / 255.0;
+      }
+    }
+
     return convertedBytes;
   }
 

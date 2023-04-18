@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "328435745541",
+    "project_id": "dogmbti-d7fa7",
+    "storage_bucket": "dogmbti-d7fa7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328435745541:android:6c8e20490e7b9c08a52d6c",
+        "android_client_info": {
+          "package_name": "com.example.dogmbti"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "328435745541-ovdgaure7fnhk0obefjnemv378dhgvmm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-FvNFxolHFV3Y2YQIrrQvyBs8fneHwhY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "328435745541-ovdgaure7fnhk0obefjnemv378dhgvmm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "328435745541-4ao48u2pkjnggt28pbv7hicisjjjc1qa.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.dogmbti"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
