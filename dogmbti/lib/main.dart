@@ -179,6 +179,41 @@ class _MyHomePageState extends State<MyHomePage> {
     return convertedBytes;
   }
 
+  /*
+  List<List<List<List<double>>>> _transformImage(img.Image image) {
+    var resizedImage = img.copyResize(image, width: 256, height: 256);
+    var croppedImage = img.copyCrop(resizedImage, 16, 16, 224, 224);
+
+    var convertedBytes = List.generate(
+      1,
+      (index) => List.generate(
+        224,
+        (index) => List.generate(
+          224,
+          (index) => List.generate(
+            3,
+            (index) => 0.0,
+          ),
+        ),
+      ),
+    );
+
+    for (var i = 0; i < 224; i++) {
+      for (var j = 0; j < 224; j++) {
+        var pixel = croppedImage.getPixel(j, i);
+        convertedBytes[0][i][j][0] =
+            (img.getRed(pixel) / 255.0 - 0.485) / 0.229;
+        convertedBytes[0][i][j][1] =
+            (img.getGreen(pixel) / 255.0 - 0.456) / 0.224;
+        convertedBytes[0][i][j][2] =
+            (img.getBlue(pixel) / 255.0 - 0.406) / 0.225;
+      }
+    }
+
+    return convertedBytes;
+  }
+  */
+
   int _getPredictedLabel(List<dynamic> output) {
     double maxProb = 0;
     int maxIndex = 0;
